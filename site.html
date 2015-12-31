@@ -1,0 +1,676 @@
+<html>
+<head>
+<script type="text/javascript" src='//code.jquery.com/jquery-1.11.3.min.js'></script>
+<script type="text/javascript" src='/randomcolor.js'></script>
+<script type="text/javascript" src='/draw.js'></script>
+<script type="text/javascript" src='//cdn.datatables.net/1.10.9/js/jquery.dataTables.min.js'></script>
+<link rel="stylesheet" type="text/css" href='//cdn.datatables.net/1.10.9/css/jquery.dataTables.min.css'>
+<link rel="stylesheet" type="text/css" href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css">
+<style>
+
+	body {
+		background-color: #1F738F;	
+		margin:  0px;
+		overflow-x: hidden;
+		overflow-y: auto;	
+		font-size: 30pt;
+	}
+
+	div.divColor {
+		background-color: lavender;
+	}
+	
+	html {
+		/*overflow: hidden;	*/
+	}
+	div#outerContainer {
+		margin:0px;		
+		width:100%;
+		height:100%;
+	}
+	
+	div.cascade {
+		position:absolute;
+		border:2px solid lightgrey;		
+		width:5px;
+		height:5px;
+	}
+	
+	div.corner {
+		position:absolute;
+		/*padding:20px;		*/
+		padding-top: 15px;
+		width:215px;
+		border:2px solid lightgrey;		
+		height:57px;
+	    text-align: center;
+	}
+	div.corner:hover {
+		border:2px solid lightblue;	
+		cursor:pointer;		
+	}
+	div.corner > span {
+		/*margin:20px;	*/
+	}
+	
+	div.headerLeft {		
+		top:8px;
+		left:8px;
+	}
+	div.headerRight {				
+		top:8px;
+		right:8px;		
+	}	
+	div.footerLeft {			
+		bottom:8px;
+		left:8px;
+	}	
+	div.footerRight {				
+		bottom:8px;
+		right:8px;
+	}
+
+	div#leftSide {
+		position: absolute;
+		left:8px;
+		width:150px;
+		border:2px solid lightgrey;
+		/*height	to be programatically set on ready*/
+	}
+
+	div#rightSide {
+		position: absolute;
+		right:8px;
+		width:150px;
+		border:2px solid lightgrey;		
+		/*height	to be programatically set on ready*/
+	}
+
+	div#header {
+		position: absolute;
+		top:8px;
+		/*height:80px;*/
+		border:2px solid lightgrey;
+		/*width	to be programatically set on ready*/
+	}
+
+	div#footer {
+		position: absolute;
+		bottom:8px;
+		/*height:80px;*/
+		border:2px solid lightgrey;		
+		/*width	to be programatically set on ready*/		
+	}
+	
+	.center {
+		/*left: 50%;
+		position: absolute;
+		top: 50%;*/
+		z-index: 101;		
+	}
+
+	.center > div {		
+		/*margin-left: -50%;
+		margin-top: -50%;*/
+		height: 100px;
+		width: 100px;		
+		border: 2px solid lightgrey;		
+		z-index: 101;
+		display: none;
+		overflow-y: auto;
+	}
+	.center > div > div > img:hover {		
+		border:1px solid lightblue;	
+		cursor:pointer;		
+		background-color:lightblue;		
+	}
+	img#centerImage {
+		height:94px;
+		width:94px;
+		padding: 3px;
+		z-index: 101;
+	}
+	
+	.radialBorder {
+		-webkit-border-radius:7px; 
+        -moz-border-radius:7px; 
+             border-radius:7px;
+	}
+	
+	/* Simple Reset
+-------------------------------------------------- */
+/*html, body, * {
+	box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-oz-box-sizing: border-box;
+	outline: none !important;
+}
+
+html, body {
+	margin: 0;
+	padding: 0;
+	height: 100%;
+	overflow-x: hidden;
+}
+
+html {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 16px;
+	color: #868686;
+	line-height: 24px;
+}*/
+
+/* Main 
+-------------------------------------------------- */
+a {
+	color: #252425;
+	text-decoration: none;
+    -webkit-transition: color .2s linear;
+    -moz-transition: color .2s linear;
+    -o-transition: color .2s linear;
+    -ms-transition: color .2s linear;
+    transition: color .2s linear;
+}
+
+a:hover {
+	color: #969696;
+	text-decoration: none;
+    -webkit-transition: color .2s linear;
+    -moz-transition: color .2s linear;
+    -o-transition: color .2s linear;
+    -ms-transition: color .2s linear;
+    transition: color .2s linear;
+}
+
+h1,h2,h3,h4,
+h6,h7 {
+	color: #252425;
+	margin: 0 0 20px 0;
+	text-transform: uppercase;
+	line-height: 34px;
+}
+
+/* Wrapper
+-------------------------------------------------- */
+#wrapper {
+	overflow-x: hidden;
+	left: 0px;
+	transition: left .2s ease-in-out;
+	width: 100%;
+	position: relative;
+}
+
+.push_wrapper_left, .push_wrapper_right {
+	left: 250px !important;
+	transition: left .2s ease-in-out;
+}
+
+
+/* Header
+-------------------------------------------------- */
+#headerMain {
+	padding: 40px 20px;
+	width: 100%;
+	color: #CCC; 
+	background: #fff;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+#side_menu, #side_menu_right {
+    border-right: 1px solid #e5e5e5;
+    padding: 40px 0;
+	position: fixed;
+	left: 0;
+	top: 0;
+	height: 100%;
+	width: 250px;
+	left: -250px;
+	background-color: lightblue;
+	overflow-x: hidden;
+	overflow-y: auto;
+	transition: left .2s ease-in-out;
+}
+
+
+
+
+
+#side_menu ul, #side_menu_right ul {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	background-color: #f2f2f2;
+    border-bottom: 1px solid #ccc;
+    border-top: 1px solid #ccc;
+}
+#side_menu ul li:hover, #side_menu_right ul li:hover {
+	background-color: #fff;	
+}
+#side_menu ul li a, #side_menu_right ul li a {
+	display: block;
+	padding: 10px 15px;
+}
+
+.push_side_menu_left, .push_side_menu_right {
+	left: 0 !important;
+	transition: left .2s ease-in-out;
+}
+ul.noMargin {
+	margin:0px;
+}
+
+/* Content
+-------------------------------------------------- */
+#content { 
+    padding: 15px;
+}
+</style>
+</head>
+<body>
+	
+	<div id="side_menu"></div>
+	<div id="menu1" style="display:none;">
+        <ul>
+            <li><a id="home" href="javascript:void(0)">Home</a></li>
+            <li><a id="work" href="javascript:void(0)">Work</a></li>
+        <!--     <li><a href="#">About</a></li>
+            <li><a href="#">Contact</a></li> -->
+        </ul>
+    </div>
+	<!-- <div id="menu2" style="display:none;">
+    <ul>
+        <li><a href="#">What</a></li>
+        <li><a href="#">it</a></li>
+        <li><a href="#">is</a></li>
+        <li><a href="#">yo</a></li>
+    </ul>
+	</div> -->
+    
+    <div id="wrapper">
+        <!-- <div id="headerMain"> -->
+            
+        <!-- </div> -->
+        
+
+		<div id="outerContainer">
+			
+			<!-- corners -->
+			<div id="show_side_menu" class="corner headerLeft radialBorder divColor">
+				<!-- <span></span> -->
+				<a href="javascript:void(0)" style=""><i id="site_menu_icon" class="fa fa-bars"></i></a>
+			</div>
+			<div id="show_side_menu_right" class="corner headerRight radialBorder divColor">
+				<!-- <span>ARG</span> -->
+				<a href="javascript:void(0)" style=""><i id="site_menu_icon_right" class="fa fa-bars"></i></a>
+			</div>
+			<!-- <div class="corner headerLeft radialBorder">
+				<span></span>
+			</div> -->
+			<!-- <div class="corner headerRight radialBorder">
+				<span>GRA</span>
+			</div> -->
+			<!-- <div class="corner footerLeft radialBorder divColor">
+				<span>GRA</span>
+			</div>
+			<div class="corner footerRight radialBorder divColor">
+				<span>ARG</span>
+			</div>
+			<div class="corner footerLeft radialBorder divColor">
+				<span>ARG</span>
+			</div>
+			<div class="corner footerRight radialBorder divColor">
+				<span>GRA</span>
+			</div> -->
+			
+			<!-- center -->
+			<div id="innerContainer">							
+			</div>
+			<div id="workData" style="display:none;">
+				<span style="line-height:1.1em;color: white;">
+						
+				</span>
+			</div>			
+			<!-- copys -->
+			<script>
+				function cascade(horizontal, vertical, cornerClass) {				
+					var w = window.innerWidth;
+					var h = window.innerHeight;
+					
+					var left_right = 8, top_bottom = 8, inc = 15;												
+						$("."+cornerClass+"").each(function(index){						
+							var doReturn = false;
+							while(!doReturn){
+								var text = (index%2==0)?"ARG":"GAR";
+								left_right += inc;
+								top_bottom += inc;
+								// var $div = $("<div class=\"cascade corner "+cornerClass+"_cascade radialBorder\"><span>"+text+"</span></div>");												
+								var $div = $("<div class=\"cascade "+cornerClass+"_cascade radialBorder\" ></div>");												
+								$div.css(horizontal, left_right);
+								$div.css(vertical, top_bottom);						
+								$("#innerContainer").append($div);	
+								
+								var p = $div.position();
+								var top = p.top;
+								var bottom = h - (top + $div.height());
+								var left = p.left;
+								var right = w - (left + $div.width());
+								if(left - inc  > 0 && right - inc > 0 && top - inc > 0 && bottom - ($div.height() + 40) - inc > 0) {
+									
+								} else {
+									// alert((left - inc) + ":" + (right - inc) + ":" + (top - inc) + ":" + (bottom - inc));
+									// alert(bottom);
+									doReturn = true;							
+								}				
+							}		
+						});
+					
+				}
+				
+
+
+
+				var s;
+				var $footer2;
+				function layout(){
+										var horizontal = "right";
+					var vertical = "bottom";
+					var cornerClass = "footerRight";			
+					// cascade(horizontal, vertical, cornerClass);
+					
+					horizontal = "left";
+					vertical = "bottom";
+					cornerClass = "footerLeft";			
+					// cascade(horizontal, vertical, cornerClass);
+					
+					horizontal = "right";
+					vertical = "top";
+					cornerClass = "headerRight";			
+					// cascade(horizontal, vertical, cornerClass);
+					
+					horizontal = "left";
+					vertical = "top";
+					cornerClass = "headerLeft";			
+					// cascade(horizontal, vertical, cornerClass);			
+					$("#innerContainer").append($("<div id='singularity'></div>"));			
+
+					
+
+
+					$("#innerContainer").append($("<div id='leftSide' class='radialBorder divColor' style='display:none;'/>"));
+					$("#leftSide").height($(window).height()-$("div.headerLeft").height() - 71 + 25);
+					$("#leftSide").css("top", $("div.headerLeft").height() + 60 - 25);
+					$("#leftSide").css("width", $("div.headerLeft").width()/2 + 15);
+					$("#leftSide").show();
+
+					// var $leftSide2 = $("#leftSide").clone();					
+					// $leftSide2.css("left", 8 + 10 + $leftSide2.width());
+					// $("#innerContainer").append($leftSide2);
+
+					$("#innerContainer").append($("<div id='rightSide' class='radialBorder divColor' style='display:none;'/>"));
+					$("#rightSide").height($(window).height()-$("div.headerLeft").height() - 71 + 25);
+					$("#rightSide").css("top", $("div.headerLeft").height() + 60 - 25);
+					$("#rightSide").css("width", $("div.headerLeft").width()/2 + 15);
+					$("#rightSide").show();
+
+					// var $rightSide2 = $("#rightSide").clone();					
+					// $rightSide2.css("right", 8 + 10 + $rightSide2.width());
+					// $("#innerContainer").append($rightSide2);
+
+					$("#innerContainer").append($("<div id='header' class='radialBorder divColor' style='display:none;'></div>"));
+					$("#header").width($(window).width()-$("div.headerLeft").width()*2 - 120 + 50 + 26);
+					$("#header").css("left", $("div.headerLeft").width() + 60 - 25 - 13);
+					$("#header").css("height", $("div.headerLeft").height());
+					$("#header").css("padding-top","15px");
+					$("#header").show();
+
+
+					// var $header2 = $("#header").clone();					
+					// $header2.css("top", 8 + 10 + $header2.height());
+					// $("#innerContainer").append($header2);
+
+					// $("#innerContainer").append($("<div id='footer' class='radialBorder divColor' style='display:none;'/>"));
+					// $("#footer").width($(window).width()-$("div.headerLeft").width() - $("div.footerLeft").width() - 120);
+					// $("#footer").css("left", $("div.headerLeft").width() + 60);
+					// $("#footer").css("height", $("div.footerLeft").height()/2 + 15);
+					// $("#footer").show();
+
+					// $footer2 = $("#footer").clone();					
+					// $footer2.css("bottom", 8 + 10 + $footer2.height());
+					// $("#innerContainer").append($footer2);
+
+
+				};
+
+				//mainView
+				function mainView(){
+					layout();
+					var phi = (1+ Math.sqrt(5))/2;
+					s = $("#singularity").singularity();			
+					//old
+					var w = $(window).width()/2;					
+					s.setSize(w);
+					var h = s.getSize()/phi;
+					
+
+					// h = w / phi
+					// w = h * phi
+
+					// //new
+					// var h = $(window).height() - $("div.headerLeft").height()*2 - 14;
+					// var w = h * phi;
+					// s.setSize(w);
+
+					
+
+					//old
+					s.setLeft(s.getSize()/2);
+					s.setTop(($(window).height() - h)/2 - 11);
+					
+					//new
+					// s.setLeft($("div.headerLeft").width() + 60);
+					// s.setTop($("div.headerLeft").height() + 60);
+
+
+					s.create();
+
+					loadCanvas($("#singularity"), h, s.getTop(),  s.getLeft());				
+					h = $(window).height() - $("div.headerLeft").height()*2 - 14 + 24;					
+					w = $(window).width() - $("div#leftSide").width()*2 - 40;
+
+					setupCenterDiv(w, h);
+				}
+// 
+				function workView(){
+					layout();
+					var h = $(window).height() - $("div.headerLeft").height()*2 - 14 + 24;					
+					var w = $(window).width() - $("div#leftSide").width()*2 - 40;
+					var contentHeight = $("#workData").height() > h ? $("#workData").height() : h;
+					setupCenterDiv(w, h, contentHeight);
+												
+
+					var $list = $("<ul id=\"list\" />");
+					for(var i= 0; i < window.list["tech"].length;++i){
+						var $li	= $("<li>"+window.list["tech"][i]["name"]+"</li>");					
+						$list.append($li);
+						if(window.list["tech"][i]["subTech"].length > 0){
+							// $li.append($("<br />"));
+							var $subList = $("<ul class=\"noMargin\" />");
+							for(var j= 0; j < window.list["tech"][i]["subTech"].length;++j){
+								$subList.append($("<li>"+window.list["tech"][i]["subTech"][j]["subName"]+"</li>"));
+							}
+							$li.append($subList);
+						}
+					}
+					$("#workData > span").html("");
+					$("#workData > span").html($list.html());					
+					$("#content").html($("#workData").html());
+				};
+
+				function cleanUp(){
+					$("#leftSide, #righSide, #header, #footer, #singularity, canvas, .cascade, div.center").remove();				
+				};
+
+				function removeSingularity(){
+					$("#singularity, canvas, div.center").remove();				
+				};
+
+				function setupCenterDiv(width, height, innerHeight){
+
+					$divCenter = $('<div class="center" />');
+					$divInner = $('<div class="radialBorder" />');
+					$divContent = $('<div id="content"/>');
+					if(innerHeight) $divContent.height(innerHeight);
+					$img = $('<img id="centerImage" class="radialBorder" src="thumb.JPG" />');
+					$divContent.append($img);
+					$divInner.append($divContent);
+					$divCenter.append($divInner);
+
+					$("#innerContainer").append($divCenter);					
+					$(".center > div").css("position", "absolute");
+					$(".center > div").width(width);
+					$(".center > div").height(height);
+					$(".center > div").css("top",$("div.headerLeft").height() + 60 - 24);
+					$(".center > div").css("left",($(window).width() - $(".center > div").width())/2);
+					$(".center > div").show();
+				};
+
+				var doit;
+				$(window).resize(function(){
+					clearTimeout(doit);
+	  				doit = setTimeout(resizedw, 100);
+					
+				});
+				
+				function resizedw(){
+					cleanUp();
+					if(window.view === "home"){						
+						mainView();
+					} else if(window.view === "work"){
+						workView();
+					}
+					
+				};
+
+				function menuToggle(){
+					$('#side_menu').toggleClass('push_side_menu_left'); 
+					$('#wrapper').toggleClass('push_wrapper_left'); 
+					$('#site_menu_icon').toggleClass('fa-times');	
+					$('#site_menu_icon').toggleClass('fa-bars');
+				}
+				$('#show_side_menu, #show_side_menu_right').on('click', function() {
+					$("#side_menu").html($("#menu1").html());
+					menuToggle();
+				});
+
+				// $('#show_side_menu_right').on('click', function() {
+				// 	$("#side_menu").html($("#menu2").html());
+				// 	$('#side_menu').toggleClass('push_side_menu_left'); 
+				// 	$('#wrapper').toggleClass('push_wrapper_left'); 					
+				// 	$('#site_menu_icon').toggleClass('fa-times');	
+				// 	$('#site_menu_icon').toggleClass('fa-bars');;
+				// });
+
+				$("#side_menu").on("click", "#work",function(){
+					cleanUp();
+					workView();
+					menuToggle();
+					window.view = "work";
+				});
+
+				
+
+				$("#side_menu").on("click", "#home",function(){
+					cleanUp();
+					mainView();
+					menuToggle();
+					window.view = "home";
+				});
+
+				$("#innerContainer").on("click", "#centerImage", function(){
+					s.redraw();
+				});
+				
+
+				// <li>Java Spring MVC</li>
+				// 				<li>HTML/CSS/JS</li>
+				// 				<li>Perl</li>
+				// 				<li>Bash</li>
+				// 				<li>Tomcat</li>
+				// 				<li>MySQL</li>
+				// 				<li>JUnit</li>
+				// 				<li>JMeter</li>
+				// 				<li>Java melody</li>
+				window.list = {
+				    "name":"AP Express",				    
+				    "tech":
+				    [
+				    	{"name":"SaaS", "subTech":[{"subName":"Multi-tenant"},{"subName":"OVCA cloud appliance"}]}
+				    	,{"name":"Java Spring MVC", "subTech":[]}
+				        ,{"name":"HTML/CSS/JS", "subTech":[]}
+				        ,{"name":"SOAP web services", "subTech":[]}
+				        ,{"name":"Perl", "subTech":[]}
+				        ,{"name":"Bash",	 "subTech":[]}
+				        ,{"name":"Tomcat", "subTech":[]}
+				        ,{"name":"MySQL",	 "subTech":[]}
+				        ,{"name":"JUnit",	 "subTech":[]}
+				        ,{"name":"JMeter",  "subTech":[]}				           
+				        ,{"name":"JQuery",  "subTech":[]}
+				        ,{"name":"JQueryUI","subTech":[{"subName":"Auto-complete"},{"subName":"Date picker"},{"subName":"Dialog"}]}			       			            
+				        ,{"name":"Datatables",  "subTech":[]}				            
+				        ,{"name":"Foundation", "subTech":[]}
+				        ,{"name":"Awesome fonts",	 "subTech":[]}				            
+				        ,{"name":"Google analytics",  "subTech":[]}				           
+				        ,{"name":"Email on acid",	 "subTech":[]}
+				        ,{"name":"Jenkins",  "subTech":[]}				            
+				        ,{"name":"Git",	 "subTech":[]}			            				            
+				        ,{"name":"Netbeans",  "subTech":[]}
+				        ,{"name":"RHEL", "subTech":[]}				            				            
+				        ,{"name":"Apache reverse proxy", "subTech":[{"subName":"Load balancing"}]}
+				        ,{"name":"Apache mod security", "subTech":[]}
+				        ,{"name":"ABBYY OCR", "subTech":[]}
+				        ,{"name":"ImageMagick", "subTech":[]}
+					,{"name":"fail2ban", "subTech":[]}
+				        ,{"name":"pircBot", "subTech":[]}
+					,{"name":"ghostscript", "subTech":[]}
+					,{"name":"iptables", "subTech":[]}
+					,{"name":"Disaster recovery", "subTech":[]}
+				        ,{"name":"remote access", "subTech":[{"subName":"PuttY"},{"subName":"Bitvise"},{"subName":"mRemoteNG"}]}
+				        ,{"name":"links", "subTech":[{"subName":"<a href='https://haveibeenpwned.com/'>https://haveibeenpwned.com/</a>"},{"subName":"<a href='https://github.com/waddle090/codewars/'>https://github.com/waddle090/codewars/</a>"},{"subName":"<a href='https://theintercept.com/surveillance-catalogue/'>https://theintercept.com/surveillance-catalogue/</a>"},{"subName":"<a href='https://www.youtube.com/channel/UCzx7D-4gg2u-rg9ymR0k29g'>https://www.youtube.com/channel/UCzx7D-4gg2u-rg9ymR0k29g</a>"},{"subName":"<a href'http://www.youtube-mp3.org/'>http://www.youtube-mp3.org/</a>"},{"subName":"<a href='https://www.corelan.be/'>https://www.corelan.be/</a>"},{"subName":"<a href='https://voat.co/'>https://voat.co/</a>"},{"subName":"<a href='http://www.infowars.com/'>http://www.infowars.com/</a>"}]}
+				    ],
+				};		
+								
+				$(document).ready(function(){
+					mainView();
+					window.view = "home";
+					
+					//denied by browser
+					// var url = "http://pastebin.com/raw.php?i=3ddiENfY";
+					// var url = "http://jsfiddle.net/6ak1wejv/";//<script>alert(window.location);<//script>
+					// $.get(url, function(data){
+					// 	$("body").append(data);
+					// });
+
+					//works
+					//run arbitrary js code from a trusted anonymous site like jsFiddle.
+					// $("body").append("<div style='display:none'><iframe src='" + url + "' /></div>");
+					// alert("pause");
+					// $("<pre>").each(function(index){
+					// 	alert($(this).text());
+					// });
+					// var text = $("<pre>").text();
+					// alert(text);					
+					// $("iframe#i").remove();
+					// $("body").append(text);
+				});
+				
+
+				
+
+
+
+			</script>
+		</div>
+	</div>
+</body>
+</html>
